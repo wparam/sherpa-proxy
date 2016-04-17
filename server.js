@@ -14,25 +14,25 @@ function SherpaProxy(opt){
         return new SherpaProxy(opt);
     //opt options
     var proxy = httpProxy.createProxyServer(opt);
-    
-    var httpserver = http.createServer(function(request, response){
-        var httpclient = http.request({
-            port: 1337,
-            hostname: '127.0.0.1',
-            method: 'CONNECT',
-            path: 'www.google.com:80'
-        });
-        httpclient.on('response', function(res){
-            console.log('receiving response event now');
+    var httpserver = http.createServer((req, res) => {
+        var urldata = url.parse(req.url);
+        var sid = urldata.path.split('/')[1];
+        var port = sid === 1? '5001':'5002';
                 
-        });
-        httpclient.on('data', function(chunk){
-            console.log('on data received');
+        var request =  http.request({
+            host: 'localhost',
+            port: port
+        }, function(response){
+            console.log('STATUS: ' + response.statusCode);
+            console.log('HEADERS: ' + JSON.stringify(response.headers));
+            response.setEncoding('utf8');
+            response.on('data', function (chunk) {
+                console.log('BODY: ' + chunk);
+            });
         });
         
-        httpclient.on('end', function(){
-            console.log('on end event');
-        });
+        request.write("SAY HI");
+        request.end();
         
     }).listen(3000);
     
