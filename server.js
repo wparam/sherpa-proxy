@@ -2,6 +2,7 @@ var httpProxy = require('http-proxy'),
     http = require('http'),
     path = require('path'),
     util = require('util'),
+    chalk = require('chalk'),
     EE = require('events').EventEmitter,
     url = require('url');
 
@@ -17,7 +18,11 @@ function SherpaProxy(opt){
     var httpserver = http.createServer(function(req, res){
         var urldata = url.parse(req.url);
         var sid = urldata.path.split('/')[1];
-        var port = sid == 1? '5001':'5002';
+        var port;
+        if(sid == 1)
+            port = '5001';
+        if(sid == 2)
+            port = '5002';
         var request =  http.request({
             host: 'localhost',
             port: port
@@ -33,17 +38,21 @@ function SherpaProxy(opt){
             });
         }).end();
         
-        // request.on('response', function(response){
-        //     console.log('hit response event');
-        // });
+        req.on('data', function(chunk){
+            console.log(chalk.red('hit response event'));
+        });
         
-        // request.on('data', function (chunk) {
-        //     console.log('BODY: ' + chunk);
-        // });
+        req.on('end', function () {
+            console.log(chalk.red('hit end request'));
+        });
+        
+        req.on('error', function(err){
+            console.log(chalk.red(err));
+        });
         
     }).listen(3000);
     
-    httpserver.on('connect', function(){
+    httpserver.on('connection', function(){
         console.log('On connnection');
     });
     
