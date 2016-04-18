@@ -14,25 +14,32 @@ function SherpaProxy(opt){
         return new SherpaProxy(opt);
     //opt options
     var proxy = httpProxy.createProxyServer(opt);
-    var httpserver = http.createServer((req, res) => {
+    var httpserver = http.createServer(function(req, res){
         var urldata = url.parse(req.url);
         var sid = urldata.path.split('/')[1];
-        var port = sid === 1? '5001':'5002';
-                
+        var port = sid == 1? '5001':'5002';
         var request =  http.request({
             host: 'localhost',
             port: port
         }, function(response){
-            console.log('STATUS: ' + response.statusCode);
-            console.log('HEADERS: ' + JSON.stringify(response.headers));
-            response.setEncoding('utf8');
-            response.on('data', function (chunk) {
-                console.log('BODY: ' + chunk);
+            var str = '';
+            response.on('data', function(chunk){
+                str += chunk;
             });
-        });
+            
+            response.on('end', function(){
+                console.log(str);
+                res.end(str);
+            });
+        }).end();
         
-        request.write("SAY HI");
-        request.end();
+        // request.on('response', function(response){
+        //     console.log('hit response event');
+        // });
+        
+        // request.on('data', function (chunk) {
+        //     console.log('BODY: ' + chunk);
+        // });
         
     }).listen(3000);
     
