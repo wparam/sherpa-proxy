@@ -22,7 +22,7 @@ function SherpaProxy(opt){
         if(sid == 1)
             port = '5001';
         if(sid == 2)
-            port = '5002';
+            port = '5002'; 
         var request =  http.request({
             host: 'localhost',
             port: port
