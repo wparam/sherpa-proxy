@@ -56,6 +56,9 @@ function SherpaProxy(opt){
         console.log('On connnection');
     });
     
+    proxy.web(req, res, {}, function(){
+        
+    });
     console.log('listening 3000...');
     
 }
